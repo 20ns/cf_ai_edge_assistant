@@ -1,202 +1,401 @@
-# Edge Assistant# Edge Assistant
+# Edge Assistant# Edge Assistant# Edge Assistant
 
 
 
-A production-ready AI assistant built on Cloudflare Workers that combines conversational AI with persistent memory and intelligent tool orchestration. Designed for low-latency edge deployment with strict privacy guarantees.A fast, helpful Cloudflare-edge AI that handles chat + voice, orchestrates tasks via Workflows, persists short- and long-term memory in Durable Objects, and never hallucinates tools or data access.
+[![CI/CD](https://github.com/20ns/cf_ai_edge_assistant/actions/workflows/ci-cd.yml/badge.svg)](https://github.com/20ns/cf_ai_edge_assistant/actions/workflows/ci-cd.yml)
 
 
 
-## Overview## Features
+A production-ready AI assistant built on Cloudflare Workers that combines conversational AI with persistent memory and intelligent tool orchestration. Designed for low-latency edge deployment with strict privacy guarantees.A production-ready AI assistant built on Cloudflare Workers that combines conversational AI with persistent memory and intelligent tool orchestration. Designed for low-latency edge deployment with strict privacy guarantees.A fast, helpful Cloudflare-edge AI that handles chat + voice, orchestrates tasks via Workflows, persists short- and long-term memory in Durable Objects, and never hallucinates tools or data access.
 
 
 
-Edge Assistant demonstrates modern serverless architecture by integrating Cloudflare's AI inference, Durable Objects for state management, and a flexible tool system—all running at the edge for sub-50ms global response times. The project emphasizes security, maintainability, and adherence to well-defined behavioral constraints.- **Multi-Modal Interaction**: Supports both chat and voice modes
+## Overview
 
-- **Tool System**: 
 
-**Live Demo:** [https://cf-ai-edge-assistant.ns-2004.workers.dev](https://cf-ai-edge-assistant.ns-2004.workers.dev)  - `http_fetch`: Fetch public data with attribution
 
-  - `durable_object`: Persistent memory storage (session and long-term)
+Edge Assistant demonstrates modern serverless architecture by integrating Cloudflare's AI inference, Durable Objects for state management, and a flexible tool system—all running at the edge for sub-50ms global response times. The project emphasizes security, maintainability, and adherence to well-defined behavioral constraints.## Overview## Features
 
-## Key Features  - `workflows_invoke`: Multi-step task orchestration
 
-- **Memory Management**: Session and long-term memory via Durable Objects
 
-- **Multi-Modal AI Interface**: Supports both text chat and optimized voice interactions using Llama 3.3 70B- **AI Model**: Uses Cloudflare's Llama 3.3 70B Instruct FP8 Fast
+**Live Demo:** [https://cf-ai-edge-assistant.ns-2004.workers.dev](https://cf-ai-edge-assistant.ns-2004.workers.dev)
 
-- **Persistent Memory**: Session and long-term storage via Durable Objects with built-in privacy filtering- **Edge-Native**: Runs on Cloudflare Workers for global low-latency
 
-- **Tool Orchestration**: Extensible system for HTTP requests, memory operations, and workflow invocations- **Privacy-First**: Filters sensitive data, follows strict memory policies
+
+## Key FeaturesEdge Assistant demonstrates modern serverless architecture by integrating Cloudflare's AI inference, Durable Objects for state management, and a flexible tool system—all running at the edge for sub-50ms global response times. The project emphasizes security, maintainability, and adherence to well-defined behavioral constraints.- **Multi-Modal Interaction**: Supports both chat and voice modes
+
+
+
+- **Multi-Modal AI Interface**: Supports both text chat and optimized voice interactions using Llama 3.3 70B- **Tool System**: 
+
+- **Persistent Memory**: Session and long-term storage via Durable Objects with built-in privacy filtering
+
+- **Tool Orchestration**: Extensible system for HTTP requests, memory operations, and workflow invocations**Live Demo:** [https://cf-ai-edge-assistant.ns-2004.workers.dev](https://cf-ai-edge-assistant.ns-2004.workers.dev)  - `http_fetch`: Fetch public data with attribution
 
 - **Edge-Native Performance**: Deployed globally on Cloudflare's network for consistent low latency
 
+- **Production-Grade**: Comprehensive test coverage (47 passing tests), automated CI/CD, proper error handling, and TypeScript throughout  - `durable_object`: Persistent memory storage (session and long-term)
+
+
+
+## Architecture## Key Features  - `workflows_invoke`: Multi-step task orchestration
+
+
+
+The system follows a clean, modular design:- **Memory Management**: Session and long-term memory via Durable Objects
+
+
+
+```- **Multi-Modal AI Interface**: Supports both text chat and optimized voice interactions using Llama 3.3 70B- **AI Model**: Uses Cloudflare's Llama 3.3 70B Instruct FP8 Fast
+
+User Request → Worker Router → Request Processor
+
+                                      ↓- **Persistent Memory**: Session and long-term storage via Durable Objects with built-in privacy filtering- **Edge-Native**: Runs on Cloudflare Workers for global low-latency
+
+                    ┌─────────────────┼─────────────────┐
+
+                    ↓                 ↓                 ↓- **Tool Orchestration**: Extensible system for HTTP requests, memory operations, and workflow invocations- **Privacy-First**: Filters sensitive data, follows strict memory policies
+
+              AI Inference      Tool System    Durable Objects
+
+              (Llama 3.3)     (HTTP, Memory)    (Persistence)- **Edge-Native Performance**: Deployed globally on Cloudflare's network for consistent low latency
+
+```
+
 - **Production-Grade**: Comprehensive test coverage (47 passing tests), proper error handling, and TypeScript throughout## Architecture
 
+**Core Components:**
+
+- `worker.ts` - Request routing and orchestration
+
+- `memory.ts` - Durable Object implementation with privacy filters
+
+- `tools.ts` - Tool execution engine (HTTP fetch, memory ops, workflows)## Architecture```
+
+- `prompt.ts` - System prompts and behavioral constraints
+
+- `response.ts` - Output contract validation and formatting┌─────────────────┐
 
 
-## Architecture```
 
-┌─────────────────┐
+## API ReferenceThe system follows a clean, modular design:│   User Request  │
 
-The system follows a clean, modular design:│   User Request  │
 
-└────────┬────────┘
 
-```         │
+### Chat Endpoint└────────┬────────┘
+
+```bash
+
+POST /chat```         │
+
+Content-Type: application/json
 
 User Request → Worker Router → Request Processor         v
 
-                                      ↓┌─────────────────┐
+{
 
-                    ┌─────────────────┼─────────────────┐│  Worker.ts      │ ◄─── Main entry point
-
-                    ↓                 ↓                 ↓│  (Routes)       │
-
-              AI Inference      Tool System    Durable Objects└────────┬────────┘
-
-              (Llama 3.3)     (HTTP, Memory)    (Persistence)         │
-
-```         ├──► Chat/Voice Handler
-
-         │    └─► Process Request
-
-**Core Components:**         │         ├─► Build System Prompt
-
-- `worker.ts` - Request routing and orchestration         │         ├─► Get Memory Context
-
-- `memory.ts` - Durable Object implementation with privacy filters         │         ├─► Call Cloudflare AI
-
-- `tools.ts` - Tool execution engine (HTTP fetch, memory ops, workflows)         │         ├─► Execute Tools
-
-- `prompt.ts` - System prompts and behavioral constraints         │         └─► Update Memory
-
-- `response.ts` - Output contract validation and formatting         │
-
-         ├──► Tools System
-
-## API Reference         │    ├─► http_fetch
-
-         │    ├─► durable_object
-
-### Chat Endpoint         │    └─► workflows_invoke
-
-```bash         │
-
-POST /chat         └──► Durable Objects
-
-Content-Type: application/json              └─► MemoryStore
-
-                   ├─► Session Memory
-
-{                   └─► Long-term Memory
-
-  "message": "Your question here",```
+  "message": "Your question here",                                      ↓┌─────────────────┐
 
   "user_id": "optional-user-id",
 
-  "session_id": "optional-session-id", ## API Endpoints
+  "session_id": "optional-session-id",                     ┌─────────────────┼─────────────────┐│  Worker.ts      │ ◄─── Main entry point
 
   "mode": "chat" // or "voice"
 
-}### POST /chat
-
-```Chat with the assistant.
-
-
-
-**Response Contract:****Request:**
-
-```json```json
-
-{{
-
-  "status": "success|needs_tool|refusal|error",  "message": "Your message here",
-
-  "message": "Natural language response",  "user_id": "optional-user-id",
-
-  "citations": [...],      // optional: sources referenced  "session_id": "optional-session-id",
-
-  "tool_calls": [...],     // optional: tools to be executed  "mode": "chat"
-
-  "memory_writes": [...],  // optional: data to persist}
-
-  "next_actions": [...]    // optional: suggested next steps```
-
-}
-
-```**Response:**
-
-```json
-
-### Additional Endpoints{
-
-- `GET /health` - Health check and version info  "status": "success",
-
-- `GET /memory?user_id=x&session_id=y` - Retrieve stored memories  "message": "Assistant's response",
-
-- `POST /memory` - Direct memory operations  "citations": [
-
-    {
-
-## Privacy & Security      "title": "Source Title",
-
-      "source": "https://example.com",
-
-The system implements strict data handling policies:      "detail": "Additional context"
-
-    }
-
-**Automatically Filtered:**  ],
-
-- Passwords, API tokens, and secrets  "tool_calls": [],
-
-- Payment card information  "memory_writes": [],
-
-- Social security numbers and PII  "next_actions": ["Suggested next steps"]
-
-- Sensitive health/financial data}
+}                    ↓                 ↓                 ↓│  (Routes)       │
 
 ```
 
-**Memory Policy:**
+              AI Inference      Tool System    Durable Objects└────────┬────────┘
 
-- Stores user preferences and project context with explicit consent### POST /voice
+**Response Contract:**
 
-- Session memory cleared after timeoutVoice interaction (same format as /chat, mode automatically set to "voice").
+```json              (Llama 3.3)     (HTTP, Memory)    (Persistence)         │
+
+{
+
+  "status": "success|needs_tool|refusal|error",```         ├──► Chat/Voice Handler
+
+  "message": "Natural language response",
+
+  "citations": [...],      // optional: sources referenced         │    └─► Process Request
+
+  "tool_calls": [...],     // optional: tools to be executed
+
+  "memory_writes": [...],  // optional: data to persist**Core Components:**         │         ├─► Build System Prompt
+
+  "next_actions": [...]    // optional: suggested next steps
+
+}- `worker.ts` - Request routing and orchestration         │         ├─► Get Memory Context
+
+```
+
+- `memory.ts` - Durable Object implementation with privacy filters         │         ├─► Call Cloudflare AI
+
+### Additional Endpoints
+
+- `GET /health` - Health check and version info- `tools.ts` - Tool execution engine (HTTP fetch, memory ops, workflows)         │         ├─► Execute Tools
+
+- `GET /memory?user_id=x&session_id=y` - Retrieve stored memories
+
+- `POST /memory` - Direct memory operations- `prompt.ts` - System prompts and behavioral constraints         │         └─► Update Memory
+
+
+
+## Privacy & Security- `response.ts` - Output contract validation and formatting         │
+
+
+
+The system implements strict data handling policies:         ├──► Tools System
+
+
+
+**Automatically Filtered:**## API Reference         │    ├─► http_fetch
+
+- Passwords, API tokens, and secrets
+
+- Payment card information         │    ├─► durable_object
+
+- Social security numbers and PII
+
+- Sensitive health/financial data### Chat Endpoint         │    └─► workflows_invoke
+
+
+
+**Memory Policy:**```bash         │
+
+- Stores user preferences and project context with explicit consent
+
+- Session memory cleared after timeoutPOST /chat         └──► Durable Objects
 
 - All storage operations logged and auditable
 
-### GET /memory
+Content-Type: application/json              └─► MemoryStore
 
-## Technical HighlightsList memory entries for a user/session.
+## CI/CD Pipeline
+
+                   ├─► Session Memory
+
+The project includes automated GitHub Actions workflows:
+
+{                   └─► Long-term Memory
+
+- ✅ **Automated Testing**: Runs 47 unit tests on every push and pull request
+
+- 🚀 **Continuous Deployment**: Auto-deploys to Cloudflare Workers when tests pass  "message": "Your question here",```
+
+- 🔒 **Quality Gates**: Deployment only proceeds if all tests pass
+
+- 📊 **Build Status**: Visible badge shows current build health  "user_id": "optional-user-id",
 
 
 
-**Testing:** 47 unit tests covering privacy filters, tool validation, output contracts, and configuration**Query Parameters:**
+See [CI_CD_SETUP.md](./CI_CD_SETUP.md) for configuration details.  "session_id": "optional-session-id", ## API Endpoints
 
-```bash- `user_id`: User identifier (default: "anonymous")
 
-npm test  # Runs full test suite via Vitest- `session_id`: Session identifier (default: "default")
+
+## Technical Highlights  "mode": "chat" // or "voice"
+
+
+
+**Testing:** 47 unit tests covering privacy filters, tool validation, output contracts, and configuration}### POST /chat
+
+```bash
+
+npm test  # Runs full test suite via Vitest```Chat with the assistant.
 
 ```
 
-### GET /health
-
-**Type Safety:** Full TypeScript implementation with strict mode enabledHealth check endpoint.
 
 
+**Type Safety:** Full TypeScript implementation with strict mode enabled
 
-**Performance:** ## Setup
+**Response Contract:****Request:**
 
-- Edge deployment reduces latency to <50ms globally
+**Performance:** 
 
-- Efficient caching of conversation context (last 5 messages)### Prerequisites
+- Edge deployment reduces latency to <50ms globally```json```json
 
-- Optimized token usage (1024 token limit with smart truncation)
+- Efficient caching of conversation context (last 5 messages)
 
-- [Node.js](https://nodejs.org/) (v18 or later)
+- Optimized token usage (1024 token limit with smart truncation){{
 
-**Reliability:**- [Cloudflare account](https://dash.cloudflare.com/sign-up)
+
+
+**Reliability:**  "status": "success|needs_tool|refusal|error",  "message": "Your message here",
+
+- Graceful error handling with detailed logging
+
+- Automatic retry logic for transient failures  "message": "Natural language response",  "user_id": "optional-user-id",
+
+- CORS support for browser-based clients
+
+  "citations": [...],      // optional: sources referenced  "session_id": "optional-session-id",
+
+## Development
+
+  "tool_calls": [...],     // optional: tools to be executed  "mode": "chat"
+
+```bash
+
+# Install dependencies  "memory_writes": [...],  // optional: data to persist}
+
+npm install
+
+  "next_actions": [...]    // optional: suggested next steps```
+
+# Run locally (http://localhost:8787)
+
+npm run dev}
+
+
+
+# Run tests```**Response:**
+
+npm test
+
+```json
+
+# Deploy to production
+
+npm run deploy### Additional Endpoints{
+
+```
+
+- `GET /health` - Health check and version info  "status": "success",
+
+**Requirements:**
+
+- Node.js 18+- `GET /memory?user_id=x&session_id=y` - Retrieve stored memories  "message": "Assistant's response",
+
+- Cloudflare account with Workers AI enabled
+
+- Wrangler CLI (`npm install -g wrangler`)- `POST /memory` - Direct memory operations  "citations": [
+
+
+
+## Configuration    {
+
+
+
+The system is configured via `wrangler.toml`:## Privacy & Security      "title": "Source Title",
+
+
+
+```toml      "source": "https://example.com",
+
+name = "cf-ai-edge-assistant"
+
+account_id = "your-account-id"The system implements strict data handling policies:      "detail": "Additional context"
+
+
+
+[ai]    }
+
+binding = "AI"
+
+remote = true**Automatically Filtered:**  ],
+
+
+
+[[durable_objects.bindings]]- Passwords, API tokens, and secrets  "tool_calls": [],
+
+name = "MEMORY_STORE"
+
+class_name = "MemoryStore"- Payment card information  "memory_writes": [],
+
+```
+
+- Social security numbers and PII  "next_actions": ["Suggested next steps"]
+
+AI parameters (temperature: 0.2, top_p: 0.9, max_tokens: 1024) are optimized for factual, concise responses but can be adjusted in `worker.ts`.
+
+- Sensitive health/financial data}
+
+## Design Decisions
+
+```
+
+**Why Cloudflare Workers?**
+
+- Global edge deployment without managing infrastructure**Memory Policy:**
+
+- Native AI and Durable Objects integrations
+
+- Cost-effective scaling (pay-per-request model)- Stores user preferences and project context with explicit consent### POST /voice
+
+
+
+**Why Llama 3.3 70B?**- Session memory cleared after timeoutVoice interaction (same format as /chat, mode automatically set to "voice").
+
+- Strong reasoning capabilities for tool selection
+
+- Fast inference time (FP8 quantization)- All storage operations logged and auditable
+
+- Good balance of quality and latency
+
+### GET /memory
+
+**Why Durable Objects?**
+
+- Strong consistency for user memory## Technical HighlightsList memory entries for a user/session.
+
+- Low-latency reads/writes (co-located with compute)
+
+- Built-in persistence without external databases
+
+
+
+## Future Enhancements**Testing:** 47 unit tests covering privacy filters, tool validation, output contracts, and configuration**Query Parameters:**
+
+
+
+- Integration with real calendar APIs (currently mocked)```bash- `user_id`: User identifier (default: "anonymous")
+
+- RAG (Retrieval Augmented Generation) for knowledge base queries
+
+- Multi-user conversation threadsnpm test  # Runs full test suite via Vitest- `session_id`: Session identifier (default: "default")
+
+- Analytics dashboard for usage patterns
+
+- Rate limiting and abuse prevention```
+
+
+
+## Project Context### GET /health
+
+
+
+This project was built to demonstrate:**Type Safety:** Full TypeScript implementation with strict mode enabledHealth check endpoint.
+
+1. Practical application of serverless edge computing
+
+2. Responsible AI system design with privacy guarantees
+
+3. Clean architecture principles in TypeScript
+
+4. Production-ready code with comprehensive testing and CI/CD**Performance:** ## Setup
+
+
+
+The implementation follows the specification in `PROMPT.md`, which defines behavioral constraints, memory policies, and output contracts to ensure reliable, predictable AI interactions.- Edge deployment reduces latency to <50ms globally
+
+
+
+---- Efficient caching of conversation context (last 5 messages)### Prerequisites
+
+
+
+**Built with:** Cloudflare Workers, TypeScript, Llama 3.3 70B, Durable Objects, Vitest, GitHub Actions- Optimized token usage (1024 token limit with smart truncation)
+
+
+
+**Live URL:** https://cf-ai-edge-assistant.ns-2004.workers.dev- [Node.js](https://nodejs.org/) (v18 or later)
+
+
+
+**Test:** `curl https://cf-ai-edge-assistant.ns-2004.workers.dev/health`**Reliability:**- [Cloudflare account](https://dash.cloudflare.com/sign-up)
+
 
 - Graceful error handling with detailed logging- [Wrangler CLI](https://developers.cloudflare.com/workers/wrangler/install-and-update/)
 
