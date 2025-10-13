@@ -1,4 +1,4 @@
-# Edge Assistant# Edge Assistant# Edge Assistant
+# Edge Assistant# Edge Assistant# Edge Assistant# Edge Assistant
 
 
 
@@ -6,65 +6,133 @@
 
 
 
-A production-ready AI assistant built on Cloudflare Workers that combines conversational AI with persistent memory and intelligent tool orchestration. Designed for low-latency edge deployment with strict privacy guarantees.A production-ready AI assistant built on Cloudflare Workers that combines conversational AI with persistent memory and intelligent tool orchestration. Designed for low-latency edge deployment with strict privacy guarantees.A fast, helpful Cloudflare-edge AI that handles chat + voice, orchestrates tasks via Workflows, persists short- and long-term memory in Durable Objects, and never hallucinates tools or data access.
+A conversational AI assistant running on Cloudflare Workers with Llama 3.3 70B, featuring persistent memory via Durable Objects and a flexible tool system.[![CI/CD](https://github.com/20ns/cf_ai_edge_assistant/actions/workflows/ci-cd.yml/badge.svg)](https://github.com/20ns/cf_ai_edge_assistant/actions/workflows/ci-cd.yml)
 
 
 
-## Overview
+**Live:** [cf-ai-edge-assistant.ns-2004.workers.dev](https://cf-ai-edge-assistant.ns-2004.workers.dev)
 
 
 
-Edge Assistant demonstrates modern serverless architecture by integrating Cloudflare's AI inference, Durable Objects for state management, and a flexible tool system—all running at the edge for sub-50ms global response times. The project emphasizes security, maintainability, and adherence to well-defined behavioral constraints.## Overview## Features
+## FeaturesA production-ready AI assistant built on Cloudflare Workers that combines conversational AI with persistent memory and intelligent tool orchestration. Designed for low-latency edge deployment with strict privacy guarantees.A production-ready AI assistant built on Cloudflare Workers that combines conversational AI with persistent memory and intelligent tool orchestration. Designed for low-latency edge deployment with strict privacy guarantees.A fast, helpful Cloudflare-edge AI that handles chat + voice, orchestrates tasks via Workflows, persists short- and long-term memory in Durable Objects, and never hallucinates tools or data access.
 
 
 
-**Live Demo:** [https://cf-ai-edge-assistant.ns-2004.workers.dev](https://cf-ai-edge-assistant.ns-2004.workers.dev)
+- Multi-modal interface (chat/voice) with context-aware responses
+
+- Persistent memory with automatic privacy filtering (blocks credentials, PII, payment data)
+
+- Tool orchestration (HTTP fetch, memory ops, workflow invocations)## Overview
+
+- Edge-native deployment with <50ms latency globally
+
+- Full test coverage (47 tests) with automated CI/CD
 
 
 
-## Key FeaturesEdge Assistant demonstrates modern serverless architecture by integrating Cloudflare's AI inference, Durable Objects for state management, and a flexible tool system—all running at the edge for sub-50ms global response times. The project emphasizes security, maintainability, and adherence to well-defined behavioral constraints.- **Multi-Modal Interaction**: Supports both chat and voice modes
+## Quick StartEdge Assistant demonstrates modern serverless architecture by integrating Cloudflare's AI inference, Durable Objects for state management, and a flexible tool system—all running at the edge for sub-50ms global response times. The project emphasizes security, maintainability, and adherence to well-defined behavioral constraints.## Overview## Features
 
 
 
-- **Multi-Modal AI Interface**: Supports both text chat and optimized voice interactions using Llama 3.3 70B- **Tool System**: 
+```bash
 
-- **Persistent Memory**: Session and long-term storage via Durable Objects with built-in privacy filtering
+npm install
 
-- **Tool Orchestration**: Extensible system for HTTP requests, memory operations, and workflow invocations**Live Demo:** [https://cf-ai-edge-assistant.ns-2004.workers.dev](https://cf-ai-edge-assistant.ns-2004.workers.dev)  - `http_fetch`: Fetch public data with attribution
+npm run dev          # Local development**Live Demo:** [https://cf-ai-edge-assistant.ns-2004.workers.dev](https://cf-ai-edge-assistant.ns-2004.workers.dev)
 
-- **Edge-Native Performance**: Deployed globally on Cloudflare's network for consistent low latency
+npm test            # Run tests
 
-- **Production-Grade**: Comprehensive test coverage (47 passing tests), automated CI/CD, proper error handling, and TypeScript throughout  - `durable_object`: Persistent memory storage (session and long-term)
-
-
-
-## Architecture## Key Features  - `workflows_invoke`: Multi-step task orchestration
-
-
-
-The system follows a clean, modular design:- **Memory Management**: Session and long-term memory via Durable Objects
-
-
-
-```- **Multi-Modal AI Interface**: Supports both text chat and optimized voice interactions using Llama 3.3 70B- **AI Model**: Uses Cloudflare's Llama 3.3 70B Instruct FP8 Fast
-
-User Request → Worker Router → Request Processor
-
-                                      ↓- **Persistent Memory**: Session and long-term storage via Durable Objects with built-in privacy filtering- **Edge-Native**: Runs on Cloudflare Workers for global low-latency
-
-                    ┌─────────────────┼─────────────────┐
-
-                    ↓                 ↓                 ↓- **Tool Orchestration**: Extensible system for HTTP requests, memory operations, and workflow invocations- **Privacy-First**: Filters sensitive data, follows strict memory policies
-
-              AI Inference      Tool System    Durable Objects
-
-              (Llama 3.3)     (HTTP, Memory)    (Persistence)- **Edge-Native Performance**: Deployed globally on Cloudflare's network for consistent low latency
+npm run deploy      # Deploy to Cloudflare
 
 ```
 
+## Key FeaturesEdge Assistant demonstrates modern serverless architecture by integrating Cloudflare's AI inference, Durable Objects for state management, and a flexible tool system—all running at the edge for sub-50ms global response times. The project emphasizes security, maintainability, and adherence to well-defined behavioral constraints.- **Multi-Modal Interaction**: Supports both chat and voice modes
+
+## API
+
+
+
+**POST /chat**
+
+```json- **Multi-Modal AI Interface**: Supports both text chat and optimized voice interactions using Llama 3.3 70B- **Tool System**: 
+
+{
+
+  "message": "your question",- **Persistent Memory**: Session and long-term storage via Durable Objects with built-in privacy filtering
+
+  "user_id": "optional",
+
+  "session_id": "optional",- **Tool Orchestration**: Extensible system for HTTP requests, memory operations, and workflow invocations**Live Demo:** [https://cf-ai-edge-assistant.ns-2004.workers.dev](https://cf-ai-edge-assistant.ns-2004.workers.dev)  - `http_fetch`: Fetch public data with attribution
+
+  "mode": "chat|voice"
+
+}- **Edge-Native Performance**: Deployed globally on Cloudflare's network for consistent low latency
+
+```
+
+- **Production-Grade**: Comprehensive test coverage (47 passing tests), automated CI/CD, proper error handling, and TypeScript throughout  - `durable_object`: Persistent memory storage (session and long-term)
+
+Response follows a strict contract: `status`, `message`, plus optional `citations`, `tool_calls`, `memory_writes`, `next_actions`.
+
+
+
+**Other endpoints:** `/health`, `/memory` (GET/POST)
+
+## Architecture## Key Features  - `workflows_invoke`: Multi-step task orchestration
+
+## Architecture
+
+
+
+```
+
+Request → Worker → AI (Llama 3.3) + Tools + Memory (Durable Objects)The system follows a clean, modular design:- **Memory Management**: Session and long-term memory via Durable Objects
+
+```
+
+
+
+- `worker.ts` - Routing and orchestration
+
+- `memory.ts` - Durable Object with privacy filters```- **Multi-Modal AI Interface**: Supports both text chat and optimized voice interactions using Llama 3.3 70B- **AI Model**: Uses Cloudflare's Llama 3.3 70B Instruct FP8 Fast
+
+- `tools.ts` - HTTP fetch, memory ops, workflow execution
+
+- `prompt.ts` - System constraints and behavioral rulesUser Request → Worker Router → Request Processor
+
+- `response.ts` - Output validation
+
+                                      ↓- **Persistent Memory**: Session and long-term storage via Durable Objects with built-in privacy filtering- **Edge-Native**: Runs on Cloudflare Workers for global low-latency
+
+## CI/CD
+
+                    ┌─────────────────┼─────────────────┐
+
+GitHub Actions runs tests on every push and auto-deploys to Cloudflare when tests pass. Setup requires two secrets:
+
+- `CLOUDFLARE_API_TOKEN`                    ↓                 ↓                 ↓- **Tool Orchestration**: Extensible system for HTTP requests, memory operations, and workflow invocations- **Privacy-First**: Filters sensitive data, follows strict memory policies
+
+- `CLOUDFLARE_ACCOUNT_ID`
+
+              AI Inference      Tool System    Durable Objects
+
+See [CI_CD_SETUP.md](./CI_CD_SETUP.md) for details.
+
+              (Llama 3.3)     (HTTP, Memory)    (Persistence)- **Edge-Native Performance**: Deployed globally on Cloudflare's network for consistent low latency
+
+## Tech Stack
+
+```
+
+Cloudflare Workers • TypeScript • Llama 3.3 70B • Durable Objects • Vitest • GitHub Actions
+
 - **Production-Grade**: Comprehensive test coverage (47 passing tests), proper error handling, and TypeScript throughout## Architecture
 
+---
+
 **Core Components:**
+
+Built to demonstrate serverless edge computing, responsible AI design, and production-ready TypeScript patterns.
 
 - `worker.ts` - Request routing and orchestration
 
