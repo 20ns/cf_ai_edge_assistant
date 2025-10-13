@@ -232,9 +232,13 @@ async function processRequest(
   const systemPrompt = buildSystemPrompt(mode);
   const conversationHistory = await tools.getMemory('conversation_history') || [];
   
+  const validHistory = (conversationHistory as any[])
+    .filter(msg => msg && msg.role && msg.content)
+    .slice(-5);
+  
   const messages: ChatMessage[] = [
     { role: 'system', content: systemPrompt },
-    ...conversationHistory.slice(-5),
+    ...validHistory,
     { role: 'user', content: message }
   ];
 
