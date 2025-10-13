@@ -31,6 +31,10 @@ export default {
       return await handleMemoryList(request, env, ctx);
     }
 
+    if (url.pathname === '/memory' && request.method === 'POST') {
+      return await handleMemoryWrite(request, env, ctx);
+    }
+
     if (url.pathname === '/health') {
       return new Response(JSON.stringify({ status: 'ok', version: '1.0.0' }), {
         headers: { 'Content-Type': 'application/json' }
@@ -155,6 +159,61 @@ async function handleMemoryList(request: Request, env: Env, ctx: ExecutionContex
           'Content-Type': 'application/json',
           ...corsHeaders()
         }
+      }
+    );
+  }
+}
+
+async function handleMemoryWrite(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
+  try {
+    const body = await request.json() as any;
+    const userId = body.userId || 'anonymous';
+    const sessionId = body.sessionId || 'default';
+    
+    if (!body.entries || !Array.isArray(body.entries)) {
+      return new Response(
+        JSON.stringify({ error: 'Entries array is required' }),
+        {
+          status: 400,
+          headers: { 'Content-Type': 'application/json', ...corsHeaders() }
+        }
+      );
+    }
+
+    const memoryStoreId = env.MEMORY_STORE.idFromName(`${userId}:${sessionId}`);
+    const memoryStoreStub = env.MEMORY_STORE.get(memoryStoreId);
+
+    for (const entry of body.entries) {
+      const writeRequest = new Request('https://fake-host/?op=write', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          key: entry.key,
+          value: entry.value,
+          scope: entry.scope || 'session'
+        })
+      });
+
+      const response = await memoryStoreStub.fetch(writeRequest);
+      if (!response.ok) {
+        const error = await response.json() as any;
+        return new Response(JSON.stringify(error), {
+          status: response.status,
+          headers: { 'Content-Type': 'application/json', ...corsHeaders() }
+        });
+      }
+    }
+
+    return new Response(JSON.stringify({ success: true }), {
+      headers: { 'Content-Type': 'application/json', ...corsHeaders() }
+    });
+  } catch (error) {
+    console.error('Memory write error:', error);
+    return new Response(
+      JSON.stringify({ error: 'Failed to write memory entries' }),
+      {
+        status: 500,
+        headers: { 'Content-Type': 'application/json', ...corsHeaders() }
       }
     );
   }
