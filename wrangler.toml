@@ -30,3 +30,11 @@ ENVIRONMENT = "production"
 [env.development]
 [env.development.vars]
 ENVIRONMENT = "development"
+
+[env.development.ai]
+binding = "AI"
+
+[[env.development.durable_objects.bindings]]
+name = "MEMORY_STORE"
+class_name = "MemoryStore"
+script_name = "cf-ai-edge-assistant"
