@@ -311,8 +311,13 @@ async function processRequest(
 
 async function callCloudflareAI(env: Env, messages: ChatMessage[]): Promise<string> {
   try {
+    const formattedMessages = messages.map(m => ({
+      role: m.role,
+      content: typeof m.content === 'string' ? m.content : JSON.stringify(m.content)
+    }));
+
     const response = await env.AI.run('@cf/meta/llama-3.3-70b-instruct-fp8-fast', {
-      messages: messages.map(m => ({ role: m.role, content: m.content })),
+      messages: formattedMessages,
       temperature: 0.2,
       top_p: 0.9,
       max_tokens: 1024
