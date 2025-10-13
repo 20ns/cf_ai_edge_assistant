@@ -1,0 +1,32 @@
+name = "edge-assistant"
+main = "src/worker.ts"
+compatibility_date = "2024-10-22"
+account_id = "dc3b7abb8c1dcc4c57e049f638674d14"
+
+[ai]
+binding = "AI"
+remote = true
+
+# Durable Objects
+[[durable_objects.bindings]]
+name = "MEMORY_STORE"
+class_name = "MemoryStore"
+script_name = "edge-assistant"
+
+[[migrations]]
+tag = "v1"
+new_classes = ["MemoryStore"]
+
+# Workflows (when available)
+# [[workflows]]
+# binding = "WORKFLOWS"
+# name = "edge-assistant-workflows"
+
+# Environment variables
+[vars]
+ENVIRONMENT = "production"
+
+# Development settings
+[env.development]
+[env.development.vars]
+ENVIRONMENT = "development"

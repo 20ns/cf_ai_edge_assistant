@@ -1,1 +1,33 @@
-PROMPT.md
+# Dependencies
+node_modules/
+package-lock.json
+
+# Wrangler
+.wrangler/
+.mf/
+dist/
+
+# Environment variables
+.dev.vars
+.env
+.env.*
+
+# Logs
+*.log
+npm-debug.log*
+wrangler.toml.backup
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Build
+.cache/
+.temp/

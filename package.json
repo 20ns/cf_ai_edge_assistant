@@ -1,0 +1,30 @@
+{
+  "name": "edge-assistant",
+  "version": "1.0.0",
+  "description": "A fast, helpful Cloudflare-edge AI that handles chat + voice, orchestrates tasks via Workflows, persists short- and long-term memory in Durable Objects",
+  "main": "src/worker.ts",
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy",
+    "start": "wrangler dev",
+    "test": "vitest",
+    "cf-typegen": "wrangler types"
+  },
+  "keywords": [
+    "cloudflare",
+    "workers",
+    "ai",
+    "edge",
+    "durable-objects",
+    "workflows"
+  ],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "@cloudflare/vitest-pool-workers": "^0.5.0",
+    "@cloudflare/workers-types": "^4.20241022.0",
+    "typescript": "^5.6.3",
+    "vitest": "^2.1.4",
+    "wrangler": "^4.42.2"
+  }
+}

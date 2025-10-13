@@ -1,0 +1,6 @@
+# Environment Variables Template
+# Copy this file to .dev.vars for local development
+# Never commit .dev.vars to version control
+
+# Optional: Set environment name
+# ENVIRONMENT=development
